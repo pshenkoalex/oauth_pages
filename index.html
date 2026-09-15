@@ -1,46 +1,47 @@
-<!doctype html>
+<!DOCTYPE html>
+
 <html lang="ru">
 <head>
-  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#101e27">
-  <title>OAuth Park — OpenID Connect в движении</title>
-  <meta name="description" content="Интерактивный парк OAuth 2.0 и OpenID Connect. Проследите Authorization Code + PKCE, исследуйте токены и остановите обмен на любой проверке.">
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%23101e27'/%3E%3Cpath d='M15 38V25l17-10 17 10v13L32 49z' fill='none' stroke='%23b4ef65' stroke-width='6'/%3E%3Cpath d='m15 25 17 10 17-10M32 35v14' stroke='%23b4ef65' stroke-width='4'/%3E%3C/svg%3E">
-  <link rel="stylesheet" href="style.css">
+<meta charset="utf-8"/><meta content="width=device-width, initial-scale=1" name="viewport"/>
+<meta content="#101e27" name="theme-color"/>
+<title>OAuth Park — OpenID Connect в движении</title>
+<meta content="Интерактивный парк OAuth 2.0 и OpenID Connect. Проследите Authorization Code + PKCE, исследуйте токены и остановите обмен на любой проверке." name="description"/>
+<link href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%23101e27'/%3E%3Cpath d='M15 38V25l17-10 17 10v13L32 49z' fill='none' stroke='%23b4ef65' stroke-width='6'/%3E%3Cpath d='m15 25 17 10 17-10M32 35v14' stroke='%23b4ef65' stroke-width='4'/%3E%3C/svg%3E" rel="icon" type="image/svg+xml"/>
+<link href="style.css" rel="stylesheet"/>
 </head>
 <body>
-<header class="topbar"><a class="brand" href="#" aria-label="OAuth Park — главная"><span class="brand-mark">◈</span> OAuth <strong>Park</strong><span class="edition">ИНТЕРАКТИВНЫЙ АТЛАС</span></a><button id="guideOpen" class="quiet">Как это устроено <span aria-hidden="true">↗</span></button></header>
+<header class="topbar"><div class="scene-heading"><div><div class="eyebrow">ПУТЕШЕСТВИЕ ЗАПРОСА</div><h1>Вход — это целое путешествие.</h1><p>Проследите путь от первого клика до подтверждённой личности.</p></div><span class="model-badge">CODE + PKCE</span></div><div class="flow-control"><label for="flow">МАРШРУТ</label><select id="flow"><optgroup label="По вашим UML"><option value="project_login">Вход через auth ID</option><option value="project_sso">SSO между приложениями</option><option value="project_stepup">Step-up перед операцией</option><option value="project_reauth">Ре-аутентификация</option></optgroup><optgroup label="Классические примеры"><option value="oidc">OpenID Connect · вход</option><option value="oauth">OAuth 2.0 · доступ к API</option><option value="refresh">Обновление токена</option><option value="m2m">Client credentials · M2M</option></optgroup></select></div></header>
 <main>
-<section class="workspace" aria-label="Симуляция протокола">
-  <div class="stage-column">
-    <div class="scene-heading"><div><div class="eyebrow">01 / ПУТЕШЕСТВИЕ ЗАПРОСА</div><h1>Вход — это целое путешествие.</h1><p>Проследите путь от первого клика до подтверждённой личности.</p></div><span class="model-badge">CODE + PKCE</span></div>
-    <div class="architecture-note"><button id="rolesOpen">Resource Server, UserInfo, introspection ↗</button><button id="projectGuideOpen">Разбор ваших UML ↗</button><p id="architectureNote"></p></div>
-    <div class="scene-wrap">
-      <canvas id="park" aria-label="Изометрическая карта: браузер, gateway, OIDC-клиент, провайдер и бизнес-API. Движущийся вагон показывает направление текущего запроса." role="img"></canvas>
-      <div class="scene-top"><span class="scene-title"><span class="signal" id="signal"></span><span id="statusText">Готов к отправлению</span></span><span class="scene-caption">Одна поездка · один вход</span></div>
-      <div id="stationLabels" class="station-labels" aria-label="Участники протокола"></div>
-      <div class="camera-tools"><button id="zoomOut" aria-label="Уменьшить масштаб">−</button><button id="cameraReset" aria-label="Сбросить вид" title="Сбросить вид">⌖</button><button id="zoomIn" aria-label="Увеличить масштаб">+</button></div>
-      <div class="scene-bottom"><span><i class="line front"></i>Через браузер</span><span><i class="line back"></i>Сервер → сервер</span><button id="labelsToggle" aria-pressed="true">Подписи</button></div>
-    </div>
-    <div class="transport">
-      <div class="transport-row"><button id="reset" class="icon-button" aria-label="Начать заново" title="Начать заново (R)">↺</button><button id="prev" class="icon-button" aria-label="Предыдущий шаг">‹</button><button id="play" class="play-button"><span id="playIcon">▶</span><span id="playLabel">Запустить</span></button><button id="next" class="icon-button" aria-label="Следующий шаг">›</button><div class="time-readout"><b id="stepCount">01 / 12</b><span id="channelLabel">Подготовка</span></div><label class="speed-control"><span>Скорость</span><select id="speed" aria-label="Скорость анимации"><option value="0.5">0.5×</option><option value="1" selected>1×</option><option value="2">2×</option></select></label></div>
-      <input id="timeline" class="timeline" type="range" min="0" max="1199" value="0" aria-label="Положение на временной шкале">
-      <div class="timeline-labels"><span>Начало</span><span>Получение токенов</span><span>Сессия</span></div>
-    </div>
-    <div class="token-strip"><span class="eyebrow">БАГАЖ ЗАПРОСА</span><div id="tokenButtons"></div></div>
-  </div>
-  <aside class="inspector" aria-label="Объяснение текущего шага">
-    <div class="flow-control"><label for="flow">МАРШРУТ</label><select id="flow"><optgroup label="По вашим UML"><option value="project_login">Вход через auth ID</option><option value="project_sso">SSO между приложениями</option><option value="project_stepup">Step-up перед операцией</option><option value="project_reauth">Ре-аутентификация</option></optgroup><optgroup label="Классические примеры"><option value="oidc">OpenID Connect · вход</option><option value="oauth">OAuth 2.0 · доступ к API</option><option value="refresh">Обновление токена</option><option value="m2m">Client credentials · M2M</option></optgroup></select><p id="flowCaption">Серверное приложение · Authorization Code + PKCE</p></div>
-    <div class="session-state" id="sessionState"><div><span>SSO · auth ID</span><b id="ssoState"></b></div><div><span>Приложение · authorization</span><b id="rpState"></b></div></div><div class="step-info" aria-live="polite"><div class="step-kicker"><span id="stepBadge">ШАГ 01</span><span id="stepType">ПОДГОТОВКА</span></div><h2 id="stepTitle">Подготовка поездки</h2><div class="route" id="route"></div><p id="stepDescription"></p><p class="origin-note" id="originNote"></p><div class="takeaway"><span>ЗАЧЕМ ЭТО НУЖНО</span><p id="takeaway"></p></div></div>
-    <details class="wire" open><summary>Под капотом <span>HTTP / данные</span></summary><pre><code id="wireCode"></code></pre><p class="sample-note">Схематичные примеры. Все значения вымышлены.</p></details>
-    <a class="source-link" id="stepSource" target="_blank" rel="noopener noreferrer">Читать в спецификации ↗</a>
-    <div class="scenario-control"><label for="scenario">А ЧТО, ЕСЛИ…</label><select id="scenario"><option value="happy">Всё корректно</option><option value="state">Подменён state</option><option value="pkce">Неверный code_verifier</option><option value="nonce">Не совпадает nonce</option><option value="expired">Истёк access token</option><option value="denied">Пользователь отказал</option><option value="acr">Контекст acr недостаточен</option><option value="freshness">auth_time слишком старый</option></select><p id="scenarioHint">Выберите сбой: поезд остановится на защитной проверке.</p></div>
-  </aside>
+<section aria-label="Симуляция протокола" class="workspace"><nav aria-label="Оглавление маршрута" class="journey"><button aria-controls="steps" aria-expanded="false" id="tocToggle">Станции маршрута <span id="mobileStep"></span> ▾</button><div class="section-heading"><h2>Станции маршрута</h2><span id="navCount">01 / 18</span></div><div class="steps" id="steps"></div></nav>
+<div class="stage-column">
+
+
+<div class="scene-wrap">
+<canvas aria-label="Изометрическая карта: браузер, gateway, OIDC-клиент, провайдер и бизнес-API. Движущийся вагон показывает направление текущего запроса." id="park" role="img"></canvas>
+<div class="scene-top"><span class="scene-title"><span class="signal" id="signal"></span><span id="statusText">Готов к отправлению</span></span><span class="scene-caption">Одна поездка · один вход</span></div>
+<div aria-label="Участники протокола" class="station-labels" id="stationLabels"></div>
+<div class="camera-tools"><button aria-label="Уменьшить масштаб" id="zoomOut">−</button><button aria-label="Сбросить вид" id="cameraReset" title="Сбросить вид">⌖</button><button aria-label="Увеличить масштаб" id="zoomIn">+</button></div>
+<div class="scene-bottom"><span><i class="line front"></i>Через браузер</span><span><i class="line back"></i>Сервер → сервер</span><button aria-pressed="true" id="labelsToggle">Подписи</button></div>
+</div>
+<div class="transport">
+<div class="transport-row"><button aria-label="Начать заново" class="icon-button" id="reset" title="Начать заново (R)">↺</button><button aria-label="Предыдущий шаг" class="icon-button" id="prev">‹</button><button class="play-button" id="play"><span id="playIcon">▶</span><span id="playLabel">Запустить</span></button><button aria-label="Следующий шаг" class="icon-button" id="next">›</button><div class="time-readout"><b id="stepCount">01 / 12</b><span id="channelLabel">Подготовка</span></div><input aria-label="Положение на временной шкале" class="timeline" id="timeline" max="1199" min="0" type="range" value="0"/><label class="speed-control"><span>Скорость</span><select aria-label="Скорость анимации" id="speed" title="Скорость движения; пауза на чтение не меняется"><option value="0.5">0.5×</option><option selected="" value="1">1×</option><option value="2">2×</option></select></label></div>
+
+<div class="timeline-labels"><span>Начало</span><span>Получение токенов</span><span>Сессия</span></div>
+</div>
+<div class="token-strip" id="tokenStrip"><span class="eyebrow">Багаж</span><div id="tokenButtons"></div></div>
+</div>
+<aside aria-label="Объяснение текущего шага" class="inspector">
+
+<div aria-live="polite" class="step-info"><div class="step-kicker"><span id="stepBadge">ШАГ 01</span><span id="stepType">ПОДГОТОВКА</span></div><h2 id="stepTitle">Подготовка поездки</h2><div class="route" id="route"></div><p id="stepDescription"></p><div class="session-state" id="sessionState"><div><span><button class="term" data-definition="Сессия у провайдера: позволяет входить в другие приложения без повторного ввода учётных данных." type="button">SSO-сессия ⓘ</button></span><b id="ssoState"></b></div><div><span><button class="term" data-definition="Локальная сессия RP. Возникает после проверки результата входа; отличается от SSO-сессии." type="button">Сессия приложения ⓘ</button></span><b id="rpState"></b></div></div></div><details class="explain-details"><summary>Зачем этот шаг</summary><p id="stepFullDescription" class="full-description"></p><div class="takeaway"><p id="takeaway"></p></div><p class="origin-note" id="originNote"></p></details>
+<details class="wire"><summary>HTTP и данные</summary><pre><code id="wireCode"></code></pre><p class="sample-note">Схематичные примеры. Все значения вымышлены.</p></details>
+
+<details class="scenario-details" id="scenarioDetails"><summary>А что, если… <span id="scenarioStatus"></span></summary><div class="scenario-control"><label for="scenario">А ЧТО, ЕСЛИ…</label><select id="scenario"><option value="happy">Всё корректно</option><option value="state">Подменён state</option><option value="pkce">Неверный code_verifier</option><option value="nonce">Не совпадает nonce</option><option value="expired">Истёк access token</option><option value="denied">Пользователь отказал</option><option value="acr">Контекст acr недостаточен</option><option value="freshness">auth_time слишком старый</option></select><p id="scenarioHint">Выберите сбой: поезд остановится на защитной проверке.</p></div></details>
+<details class="reference-details"><summary>Роли и схема проекта</summary><div class="architecture-note"><button id="rolesOpen">Resource Server, UserInfo, introspection ↗</button><button id="projectGuideOpen">Разбор ваших UML ↗</button><p id="architectureNote"></p><p id="flowCaption"></p></div></details><a class="source-link" id="stepSource" rel="noopener noreferrer" target="_blank">Читать в спецификации ↗</a></aside>
 </section>
-<section class="journey"><div class="section-heading"><h2>Станции маршрута</h2><span>Выберите любой шаг, чтобы разобрать его</span></div><div id="steps" class="steps"></div></section>
-<footer><span>OAuth — разрешение на доступ. OIDC — подтверждение личности.</span><button id="auditOpen">Чек-лист обновления ↗</button><button id="sourcesOpen">Первоисточники ↗</button></footer>
+
+<footer><button id="guideOpen">Справочник ↗</button><span>OAuth — разрешение на доступ. OIDC — подтверждение личности.</span><button id="auditOpen">Чек-лист обновления ↗</button><button id="sourcesOpen">Первоисточники ↗</button></footer>
 </main>
-<dialog id="detailDialog"><div class="dialog-top"><span id="dialogEyebrow" class="eyebrow">СПРАВОЧНИК</span><button id="closeDialog" aria-label="Закрыть">×</button></div><div id="dialogContent"></div></dialog>
+<dialog id="detailDialog"><div class="dialog-top"><span class="eyebrow" id="dialogEyebrow">СПРАВОЧНИК</span><button aria-label="Закрыть" id="closeDialog">×</button></div><div id="dialogContent"></div></dialog>
 <noscript>Для анимации включите JavaScript. Основа маршрута: браузер → приложение → провайдер → одноразовый код → обмен на токены → проверка ID Token → UserInfo → сессия приложения.</noscript>
-<script type="module" src="app.mjs"></script>
+<script src="app.mjs" type="module"></script>
 </body></html>
